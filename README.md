@@ -1,6 +1,6 @@
 # Introduction 
 
-prodman is a time management tool I created to optimize my own productivity and minimize procrastination. I use it to plan, track, and analyze my time and my habits. Additionally, prodman incorporates mechanisms to minimize devation from my planned schedule (*hassler*), and provide positive reinforcements for sticking to my planned schedule (*applause*).
+prodman (short for Productivity Manager) is a time management tool I created to optimize my own productivity and minimize procrastination. I use it to plan, track, and analyze my time and my habits. Additionally, prodman incorporates mechanisms to minimize devation from my planned schedule (*hassler*), and provide positive reinforcements for sticking to my planned schedule (*applause*).
 
 In some sense, it can be thought of as a Pomodoro technique (https://en.wikipedia.org/wiki/Pomodoro_Technique) timer on (a lot of) steroids. prodman is written entirely in Python; its visualization features rely heavily on Dash (https://plotly.com/dash/), but it has a fully functional commandline interface that may be utilized without the graphical features. Since I primarily work on a Mac, prodman's vocal cues are written for OS X - but may easily be adapted to other operating systems. 
 
