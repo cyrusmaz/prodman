@@ -120,7 +120,6 @@ class work_timer:
         self.system_wrapper('say ", session completed!"')
         print("SESSION COMPLETED!")
         
-
     def return_progress(self):
         if len(self.tasks)==0:
             return [], [], []
@@ -143,7 +142,6 @@ class work_timer:
         goal = deepcopy(self.totals_goal)
         goal['total*']=goal['total']
         return session_total, goal
-
 
     def return_totals_and_goals_string(self):
         
@@ -213,8 +211,6 @@ class work_timer:
     def get_input(self):
         while True:
             self.user_input = input()
-            print(self.user_input)
-            # print(self.user_input)
             if self.user_input == "pause":
                 self.pause = True
                 self.counts['pause'] += 1
@@ -223,8 +219,6 @@ class work_timer:
                 self.pause = False
             if self.user_input == "record":
                 self.record_session()
-            if self.user_input == "hello":
-                print("hello!")     
             if self.user_input == "start":
                 self.start()          
             if self.user_input == "exit":
@@ -471,7 +465,6 @@ class work_timer:
             output = "{}:{}:{}".format(hours,minutes,seconds)
             return(output)
 
-
     def general_timer(  self, 
                         task, 
                         length,
@@ -577,7 +570,6 @@ class work_timer:
 
             time.sleep(1)
 
-
     def next_timer(self):
         start_time = datetime.datetime.now()
 
@@ -600,7 +592,6 @@ class work_timer:
 
         self.initialize_user_input() 
         return response
-
 
     def pause_timer(self, timedelta_remaining):
         print("PAUSING SESSION! type unpause to continue!\n")                  
@@ -644,7 +635,6 @@ class work_timer:
             self.system_wrapper('say "and returning to {}"'.format(self.task))    
             return ""
 
-
     @staticmethod
     def system_wrapper(string):
         def dictate(string):
@@ -652,8 +642,6 @@ class work_timer:
             return
         t=threading.Thread(target=dictate, kwargs={'string':string})
         t.start()
-
-
 
     def hassler(self, task, focus):
         #########
@@ -700,10 +688,6 @@ class work_timer:
         self.initialize_user_input() 
         #########
         self.hassler_status = False
-
-
-      
-
 
 # if __name__ == "__main__":
 
