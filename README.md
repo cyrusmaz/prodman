@@ -69,6 +69,8 @@ TODO
 1. PM_main.py
 1. PM_backend.py
 1. PM_db_init.py
+1. applaud.aiff
+1. glass.aiff
 
 **PM_config.py** contains the configuration parameters. The following paths **must** be set by the user: 
 - applause_sound_location 
@@ -80,6 +82,10 @@ TODO
 **PM_backend.py** contains the backend functionality of the application including keeping track of schedule/user progress, as well as interacting with the database. PM_backend.py may be used independently of the front-end visualization/analytics features. 
 
 **PM_db_init.py** contains the code to initialize the database for the application. Only needs to be run once. 
+
+**applaud.aiff** is the applaud sound effect. Replace with your own sound effect if desired.
+
+**glass.aiff** is the ding sound effect. Replace with your own sound effect if desired.
 
 # Installation
 prodman is written entirely in Python. Furthermore, prodman stores historical records and saved templates on a Postgres server in a Docker container. 
