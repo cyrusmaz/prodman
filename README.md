@@ -1,9 +1,12 @@
 # Introduction 
 
-prodman is a time management tool I wrote to optimize my own productivity. In some sense, it can be thought of as a Pomodoro technique (https://en.wikipedia.org/wiki/Pomodoro_Technique) timer on steroids. prodman is written entirely in Python; its visualization features rely heavily on dash (https://plotly.com/dash/), but it has a fully functional commandline interface. Since I primarily work on a Mac, prodman's vocal cues are written for OS X - but can easily be adapted to other operating systems. 
+prodman is a time management tool I created to optimize my own productivity and minimize procrastination. I use it to plan, track, and analyze my time and my habits. Additionally, prodman incorporates mechanisms to minimize devation from my planned schedule (*hassler*), and provide positive reinforcements for sticking to my planned schedule (*applause*).
+
+In some sense, it can be thought of as a Pomodoro technique (https://en.wikipedia.org/wiki/Pomodoro_Technique) timer on (a lot of) steroids. prodman is written entirely in Python; its visualization features rely heavily on Dash (https://plotly.com/dash/), but it has a fully functional commandline interface that may be utilized without the graphical features. Since I primarily work on a Mac, prodman's vocal cues are written for OS X - but may easily be adapted to other operating systems. 
 
 # Usage:
 
+## GUI:
 ### Tracker
 This is where most of the user's time will be spent. The Tracker gives the user cues about what task/focus to concentrate on at a given time, based on a schedule that the user has built under the Schedule tab, and deployed. The Tracker contains numerical analytics updated every second, and graphical analytics updated every 10 seconds. 
 
@@ -58,6 +61,73 @@ This is where the user can view analyze saved sessions. The user may choose to a
 
 [History: Multiple gif](https://github.com/cyrusmaz/prodman/blob/master/gifs/history_multi.gif)
 
+## Command-line:
+TODO
+
+# File Structure
+1. PM_config.py
+1. PM_main.py
+1. PM_backend.py
+1. PM_db_init.py
+
+**PM_config.py** contains the configuration parameters. The following paths **must** be set by the user: 
+- applause_sound_location 
+- ding_sound_location 
+- database_location
+
+**PM_main.py** contains the front-end of the application. 
+
+**PM_backend.py** contains the backend functionality of the application including keeping track of schedule/user progress, as well as interacting with the database. PM_backend.py may be used independently of the front-end visualization/analytics features. 
+
+**PM_db_init.py** contains the code to initialize the database for the application. Only needs to be run once. 
+
 # Installation
+prodman is written entirely in Python. Furthermore, prodman stores historical records and saved templates on a Postgres server in a Docker container. 
+
+### Python & Dependencies
+Install Python: https://www.python.org/downloads/
+
+Install the Python dependencies: (numpy, pandas, plotly, dash, matplotplib, sqlalchemy, psycopg2)
+
+Installing *psycopg2* will require an installation of *postgresql* first, which is a little tricky on OS X, but Homebrew (https://brew.sh/) has made it convenient. 
+
+To install Homebrew, type the following in Terminal:
+
+> /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+Once, you have Homebrew, install *postgresql* by typing the following in Terminal:
+
+> brew install postgresql
+
+Then, proceed to install *psycopg2* in Terminal:
+
+> pip3 install psycopg2)
+
+### Docker
+Install Docker: https://docs.docker.com/docker-for-mac/install/
+
+Then, install Postgres for Docker, by typing the following in Terminal:
+
+> docker pull postgres
+
+### Configuring PM_config.py
+Set **database_location** to be equal to the path where you want your prodman database to be stored. If the directory does not exist, the database initialization script (PM_db_init.py) will create it. 
+
+Set **applause_sound_location** to be equal to the path where applause.aiff (or an applause sound file of your choice) is stored.
+Set **ding_sound_location** to be equal to the path where glass.aiff (or a ding sound effect file of your choice) is stored.
+
+### Database Initialization
+First, double check that **database_location** is set to your liking. See above for details.
+
+In Terminal, traverse to where *PM_db_init.py* is saved, and type the following: 
+
+> python3 PM_db_init.py
+
+This will give an error because this script both starts a Postgres server in a Docker container, AND initializes the database, and firing up the Docker container takes a bit of time. Hence, wait a minute or so and run the same command again. If you encounter the same error, wait a few moments and try again. Once the command runs without error, you are all set!
+
 
 # Caveats
+Currently unable to jump to next block while paused. 
+
+# Acknowledgement
+This application was inspired by the works of James Clear (https://jamesclear.com/habit-tracker) and Scott Young (https://www.scotthyoung.com/blog/ultralearning). 
