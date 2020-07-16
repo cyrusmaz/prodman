@@ -38,6 +38,7 @@ Setting *Dinger* to a numerical value will play a ding sound effect at regular i
 The user may deploy a schedule to the Tracker or save it to Templates for later user/editing.
 
 [Schedule: Custom gif](https://github.com/cyrusmaz/prodman/blob/master/gifs/custom_sched.gif)
+
 [Deploy Schedule gif](https://github.com/cyrusmaz/prodman/blob/master/gifs/deploy_sched.gif)
 
 #### Schedule: Templates
