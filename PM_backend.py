@@ -8,20 +8,18 @@ import json
 from sqlalchemy import text, create_engine
 from functools import reduce
 
+# CUSTOM SCRIPT:
+import PM_config
+
 
 class work_timer:
-    def __init__(
-        self, 
-        applause_sound_location="/Users/user/Documents/PYTHON_PROJECTS/work_TIMER/applaud.aiff",
-        ding_sound_location='/System/Library/Sounds/glass.aiff'
-        ):
+    def __init__(self, applause_sound_location,ding_sound_location):
 
         self.applause_sound_location = applause_sound_location
         self.ding_sound_location = ding_sound_location
 
         self.tasks = []
         self.schedule = []
-
 
         self.totals_goal = {}
         
@@ -102,8 +100,6 @@ class work_timer:
     def initialize_user_input(self): self.user_input=None
 
     def start(self):
-        # t=threading.Thread(name="input", target=self.get_input, daemon=True)
-        # t.start()
         self.current_block_index = 0
         self.session_complete = False
         self.pause = False
@@ -115,17 +111,14 @@ class work_timer:
             a=self.general_timer(**block)
             if a=="finish":
                 self.end_timeline_block()
-                # print('backend here 1 ')
                 self.session_complete = True
                 self.task = None
                 self.initialize_user_input()
                 break
             self.current_block_index += 1   
-        # print('backend here 2 ') 
         self.session_complete = True
         self.system_wrapper('say ", session completed!"')
         print("SESSION COMPLETED!")
-        # t.join()
         
 
     def return_progress(self):
@@ -171,7 +164,7 @@ class work_timer:
         total_elapsed = current_time - self.session_start_time
         os.system("printf '\033c'")
         print("****************************************************************************")
-        # print("Session started at: {}".format(self.session_start_time))
+        print("Session started at: {}".format(self.session_start_time))
         # date_string="{}:{}:{}".format(self.session_start_time.year,str(self.session_start_time.month).rjust(2, "0"),str(self.session_start_time.day).rjust(2, "0"))
         # time_string="{}:{}:{}".format(str(self.session_start_time.hour).rjust(2, "0"),str(self.session_start_time.minute).rjust(2, "0"),str(self.session_start_time.second).rjust(2, "0"))
         print("START DATE: {}".format(self.date_string))
@@ -180,8 +173,8 @@ class work_timer:
         # print("TIMELINE:")
         # print(pd.DataFrame(data=self.timeline))
 
-        print("COUNTS: ")
-        print(pd.Series(self.counts))
+        # print("COUNTS: ")
+        # print(pd.Series(self.counts))
 
         print("Block index: {}".format(self.current_block_index))
 
@@ -499,7 +492,6 @@ class work_timer:
         
         print("Notes: {}!".format(notes))                     # PRING STATEMENT OF START
         
-        # os.system('say "START {}!"'.format(task))         # AUDIO STATEMENT OF START
         self.system_wrapper('say "START {}!"'.format(task))
         if (focus is not None) and (focus!=''):
             # os.system('say "FOCUS ON {}!"'.format(focus))
@@ -536,7 +528,6 @@ class work_timer:
             # string for dash display
             self.block_time_remaining = self.timedelta_to_string(timedelta_remaining)
             self.block_time_elapsed = (timedelta_elapsed_current_phase + self.timedelta_elapsed)
-            # print(str(self.block_time_elapsed/self.length))
 
 
             self.totals[task] = total_so_far + self.timedelta_elapsed + timedelta_elapsed_current_phase
@@ -545,7 +536,7 @@ class work_timer:
                     self.system_wrapper('afplay {}'.format(self.ding_sound_location))
                     dinger_time=dinger_time+datetime.timedelta(minutes=dinger)
 
-            # os.system("printf '\033c'")
+            os.system("printf '\033c'")
             self.print_stats()
             ##### UNCOMMENT THIS: 
             print("{} time remaining: {}".format(task, self.timedelta_to_string(timedelta_remaining)))
@@ -580,7 +571,6 @@ class work_timer:
             if self.user_input is not None and str.lower(self.user_input) == "next":
                 self.initialize_user_input()
                 self.end_timeline_block()
-                # os.system('say "next!"')
                 self.system_wrapper('say "next!"')
                 
                 break
@@ -593,7 +583,6 @@ class work_timer:
 
         print("Are you sure you want to go to next block?")
         print("y / n ?")
-        # os.system('say "you sure, dude ?"')
         self.system_wrapper('say "you sure, dude ?"')
 
         self.new_timeline_block(task='next')
@@ -614,8 +603,7 @@ class work_timer:
 
 
     def pause_timer(self, timedelta_remaining):
-        print("PAUSING SESSION! type unpause to continue!\n")                     # PAUSE PRINT
-        # os.system('say "pausing current session"')                                # PAUSE AUDIO
+        print("PAUSING SESSION! type unpause to continue!\n")                  
         self.system_wrapper('say "pausing current session"')
 
         self.new_timeline_block(task='pause')
@@ -682,17 +670,7 @@ class work_timer:
         if focus is None:
             print("Time to start {}".format(task))
 
-        # if focus is not None:
-        #     # os.system('say "Time to start {}, with focus on {}"'.format(task, focus)) 
-        #     self.system_wrapper('say "Time to start {}, with focus on {}"'.format(task, focus))
-        # if focus is None:
-        #     # os.system('say "Time to start {}"'.format(task))        
-        #     self.system_wrapper('say "Time to start {}"'.format(task))         
-
         print("type 'okay' to begin")
-        
-        # os.system('say "type, okay, to begin"')   
-        # self.system_wrapper('say "type, okay, to start {}"'.format(task))
 
         while self.user_input != "okay":
 
@@ -710,8 +688,6 @@ class work_timer:
                 #########
                 total_so_far = self.totals['hassler']
                 #########
-            
-            # self.system_wrapper("type, okay, to start {}".format(task))
 
             time.sleep(0.5)
 
@@ -729,55 +705,20 @@ class work_timer:
       
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-### USAGE: 
-# build a list of 'blocks' of task-time pairs in the order you wish to complete them and feed them
-# into the for loop below
-# example_block = {     'task' :               string, 
-#                       'length' :             float/int,
-#                       'focus' :              string,
-#                       'notes' :              string, 
-#                       'hassler':              boolean}
-#
-# task: can be anything. will be printed and read out loud. will be recorded if and only if set to "work" or "break". 
-#               if set to "work", you get an applause at the end of the block
-# length: the length of block in minutes
-# focus: what you intend to focus on during this block. will be printed and read out loud.
-# notes: any specific notes regarding this block. will be printed.
-# hassler: if set to True, you will be hassled at to type 'okay' in order to start the block 
-
-# commands you can use during a session: 
-# 'pause' / 'unpause' : to pause and unpause the session, regardless of task. (breaks can be paused too) 
-# 'next': goes to next block without finishing current one
-# 'record': records the current session to the log file. if there is an existing record, current session gets added 
-#           as a new row, indexed by today's date. if there is no existing record, it gets written as a new csv file.
-#  control + c to exit 
+#     schedule = [
+#         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':'next', 'focus': 'standing', 'notes': ''},
+#         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':5, 'focus': 'standing', 'notes': ''},
+#         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':None, 'focus': 'standing', 'notes': ''},
+#         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':0.1, 'focus': 'standing', 'notes': ''},
+#         {'task': 'work',        'length': 15, 'hassler': False, 'focus': 'standing', 'notes': ''},]*4
 
 
-    schedule = [
-        {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':'next', 'focus': 'standing', 'notes': ''},
-        {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':-5, 'focus': 'standing', 'notes': ''},
-        {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':None, 'focus': 'standing', 'notes': ''},
-        {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':0.1, 'focus': 'standing', 'notes': ''},
-        {'task': 'work',        'length': 15, 'hassler': False, 'focus': 'standing', 'notes': ''},]*4
+# ####################################################################################
 
-
-####################################################################################
-
-    # os.system("printf '\033c'")
-
-    # print("Press enter to begin: ")
-    # input()
-    
-    wt = work_timer()
-    wt.set_schedule(schedule)
-    t=threading.Thread(name="input", target=wt.get_input, daemon=True)
-    t.start()
-    wt.start()
-    # wt.get_templates()
-    # print(wt.template_names)
-    # print(wt.templates_dict)
-    # wt.start_daemon()
-    # t=threading.Thread(name="input", target=wt.get_input, daemon=True)
-    # t.start()
+#     wt = work_timer(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
+#     wt.set_schedule(schedule)
+#     t=threading.Thread(name="input", target=wt.get_input, daemon=True)
+#     t.start()
+#     wt.start()

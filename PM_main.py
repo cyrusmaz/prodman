@@ -13,8 +13,6 @@ from flask import Flask
 import datetime
 
 import os 
-os.chdir("/Users/user/Documents/PYTHON_PROJECTS/PM_local/")
-from PM_backend import *
 
 from copy import deepcopy
 from collections import defaultdict 
@@ -22,13 +20,14 @@ import re
 from math import floor 
 from matplotlib.pyplot import get_cmap
 
+## CUSTOM SCRIPTS:
+from PM_backend import *
+import PM_config
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 tasks = ['work', 'meditation', 'movement', 'break'] + ['pause', 'hassler']
 
 total_star_message = html.Div("(total* excludes pause and hassler from its count)", style={'text-align':'center','margin-top':'5px'})
-
-graph_loading_style="graph"
-table_loading_style="cube"
 
 multi_analysis_focus_color_scale='viridis'
 
@@ -491,9 +490,7 @@ def task_and_focus_tables_4_schedule_and_template(task_table_id, focus_table_id)
 def cumulative_focus_chart(timeline_or_schedule, title=''):
     data = deepcopy(timeline_or_schedule)
     data = list(filter(lambda x: (x['task'] in tasks+['total']) and (x['length']>=0) and (type(x['length']) in [int, float] ), data ))
-    
-    # TODO:
-    # try this: 
+
     task_focus_cum_list = [block['task']+": "+block['focus'] if ((block['focus'] is not None) and (block['focus'] is not '')) else block['task'] for block in data]
 
     # old: runs into issue when focus is Nonetype
@@ -2919,10 +2916,10 @@ multi_templates_page = html.Div(children=[
 schedule_tabs = dcc.Tabs(
     id='schedule-tabs',
     children=[
-        dcc.Tab(label='Custom Schedule', id="schedule-custom-tab", 
+        dcc.Tab(label='Custom', id="schedule-custom-tab", 
                 children=[schedule_custom_page_html], 
                 style=tab_style, selected_style=tab_selected_style),
-        dcc.Tab(label='My Templates', id="schedule-my-templates-tab", 
+        dcc.Tab(label='Templates', id="schedule-my-templates-tab", 
                 children=[
                     templates_page_html,
                     template_confirm_delete], 
@@ -3846,9 +3843,44 @@ def deploy_button_pressed(
         session_schedule_focus_chart.update_layout(height=450)
         return [], go.Figure(), current_tab, True, True, False, [], [], tracker_focus_table_selected_rows, tracker_task_table_selected_rows, True, deployed_schedule_data, session_schedule_task_chart, session_schedule_focus_chart
 
+    # Output('tracker-init-html','hidden'),
+    # Output('tracker-presession-html','hidden'),
+    # Output('tracker-session-html','hidden'),
+
     else:
         # fig = go.Figure()
-        return [], go.Figure(), current_tab, False,  True, True, [], [], [], [], True, [], go.Figure(), go.Figure()
+        if wt.session_complete is False:
+            charts_interval_disabled = False
+            tracker_init_hidden = True
+            tracker_presession_hidden = True
+            tracker_session_hidden = False
+            landing_tab = 'tracker-tab'
+
+            schedule=wt.schedule
+            task_focus_cum_list = [block['task']+": "+block['focus']  for block in schedule]
+            unique_task_focus_pairs = list(set(task_focus_cum_list))
+            focus_selected_rows = list(range(len(unique_task_focus_pairs)))
+
+            tasks_list = [block['task'] for block in schedule]
+            unique_tasks = list(set(tasks_list))
+            task_selected_rows = list(range(len(unique_tasks)+3))
+
+            session_schedule_task_chart = cumulative_plot(schedule, title="Session Schedule: Tasks Overview")
+            session_schedule_task_chart.update_layout(height=450)
+            session_schedule_focus_chart = cumulative_focus_chart(schedule, title="Session Schedule: Foci Overview") 
+            session_schedule_focus_chart.update_layout(height=450)
+
+        else: 
+            charts_interval_disabled = True
+            tracker_init_hidden = False
+            tracker_presession_hidden = True
+            tracker_session_hidden = True
+            landing_tab = current_tab
+            schedule = []
+            focus_selected_rows = []
+            task_selected_rows = []
+            session_schedule_task_chart, session_schedule_focus_chart = go.Figure(), go.Figure()
+        return [], go.Figure(), landing_tab, tracker_init_hidden, tracker_presession_hidden, tracker_session_hidden, [], [], focus_selected_rows, task_selected_rows, charts_interval_disabled, schedule, session_schedule_task_chart, session_schedule_focus_chart
 
 # ABOVE TABS         
 @dash_app.callback(
@@ -4653,9 +4685,9 @@ def finish_and_record(n_clicks):
 
     if button_id=='refresh-templates-button':
         wt.get_templates()
-        options = [{'label': template, 'value': template} for template in wt.template_names]
-    else: 
-        wt.get_templates(audio=False)
+        # options = [{'label': template, 'value': template} for template in wt.template_names]
+    # else: 
+    #     wt.get_templates(audio=False)
     options = [{'label': template, 'value': template} for template in wt.template_names]
 
     return options
@@ -4759,18 +4791,10 @@ def template_update(
 ############################################################################################################################################################
 ############################################################################################################################################################
 
-
-#### GOOGLE APP ENGINE:
-# if __name__ == '__main__':
-#     app.run(host='127.0.0.1', port=8080, debug=True)
-
-#### TESTING AND DEV:
-# if __name__ == '__main__':
-#     dash_app.run_server(host='127.0.0.1', port=8080, debug=True)
-
-
 if __name__ == '__main__':
-    wt = work_timer()
+
+    PM_config.postgres_startup()  
+    wt = work_timer(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
     t=threading.Thread(name="input", target=wt.get_input, daemon=True)
     t.start()
     dash_app.run_server(host='127.0.0.1', port=8080, debug=True)
