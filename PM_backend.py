@@ -8,7 +8,6 @@ import json
 from sqlalchemy import text, create_engine
 from functools import reduce
 
-# CUSTOM SCRIPT:
 import PM_config
 
 
@@ -263,6 +262,18 @@ class work_timer:
         return timeline_completed
 
     #### SQL DATABASE FUNCTIONS:
+
+    def postgres_startup(self):
+        docker_shell_command = 'docker run --rm --name {} -e POSTGRES_PASSWORD=docker -d -p {}:{} -v {}:/var/lib/postgresql/data postgres'.format(
+            PM_config.postgres_container_name, 
+            PM_config.pg_local_port,
+            PM_config.pg_docker_port, 
+            PM_config.database_location)
+        check_container = 'docker container inspect {} > /dev/null 2>&1 || '.format(PM_config.postgres_container_name)
+        # fire up postgres in a docker container if there is currently no docker container by the name of postgres_container_name
+        os.system(check_container+docker_shell_command)
+
+
     def get_history(self, start_date, end_date):
         pg_local_port='5430'
         db_string = 'postgresql://postgres:docker@localhost:{}/postgres'.format(pg_local_port)
@@ -371,7 +382,6 @@ class work_timer:
             self.system_wrapper('say "1 session deleted"')
         else:    
             self.system_wrapper('say "{} sessions deleted"'.format(len(session_dates)))
-
 
     def record_session(self, session_name=None):
         pg_local_port='5430'

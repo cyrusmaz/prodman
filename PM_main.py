@@ -4,23 +4,18 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 import dash_table
 from dash_table.Format import Format, Scheme, Sign, Symbol
-
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
-
 from flask import Flask
 import datetime
-
 import os 
-
 from copy import deepcopy
 from collections import defaultdict 
 import re
 from math import floor 
 from matplotlib.pyplot import get_cmap
 
-## CUSTOM SCRIPTS:
 from PM_backend import *
 import PM_config
 
@@ -51,7 +46,6 @@ colors = {
     'selected_tab_background': '#7A94A5',
     'disabled_tab_background' : '#EBE9E9'
     }
-
 
 tabs_styles = {
     'height': '38px',
@@ -110,9 +104,6 @@ tab_disabled_style = {
     'margin-left': '2px',
     'margin-right': '2px'
 }
-
-
-
 
 ########################################################################################################################################################################
 ########################################################################################################################################################################
@@ -227,7 +218,6 @@ def current_info_html_output(task, focus, notes, block_length, block_time_elapse
         notes=''   
 
     if (block_time_elapsed is not None) and (block_length is not None):
-        # progress = str(block_time_elapsed.total_seconds()/block_length.total_seconds()*100)
         progress_string = "{} / {}".format(timedelta_to_string(block_time_elapsed), timedelta_to_string(block_length))
     else: 
         # progress = '0'
@@ -248,8 +238,6 @@ def current_info_html_output(task, focus, notes, block_length, block_time_elapse
         hidden_columns=hidden_columns+['focus']
 
     data = dict(task=task, focus=focus, notes=notes,pause=pause, progress=progress_string, status=status)
-
-    # [{'if': {'filter_query': '{pause} = yes', 'backgroundColor': colors['pause'],'color': 'white'}}]
 
     output = dash_table.DataTable(
         columns=[
@@ -273,8 +261,6 @@ def current_info_html_output(task, focus, notes, block_length, block_time_elapse
             'whiteSpace': 'normal',
             'textAlign': 'center',
             'border': '2px solid black',
-            # 'height': 'auto',
-            # 'lineHeight': '15px'
             },    
         )
     return output 
@@ -293,7 +279,7 @@ def info_table_from_schedule(data, tasks=['work', 'break', 'meditation', 'moveme
 
         style_data_conditional = [{'if': {'column_id': task},'backgroundColor': colors[task]} for task in tasks],
 
-        style_cell={ #### FIX THIS UP!
+        style_cell={ 
             'backgroundColor': '#CFCFCF',
             'font-family': 'HelveticaNeue',
             'font-size': '12px',        
@@ -323,8 +309,6 @@ def tracker_schedule_helper(data=[], id='tracker-presession-schedule', cell_bord
                 {'id': 'hassler', 'name': 'Hassler', 'presentation': 'dropdown'},
                 {'id': 'applause', 'name': 'Applause', 'presentation': 'dropdown'},
                 {'id': 'dinger', 'name': 'Dinger', 'presentation': 'input', 'type' :'numeric'},
-
-                # {'id': 'session_notes', 'name': 'Session Notes', 'presentation': 'input', 'type' :'text'},
             ],
         dropdown={
             'task': {'options' : [
@@ -369,7 +353,7 @@ def tracker_schedule_helper(data=[], id='tracker-presession-schedule', cell_bord
             {'selector': '.Select-arrow','rule': '''--accent: black;'''},              
             ],
             
-        style_cell = { #### FIX THIS UP!
+        style_cell = {
             'backgroundColor': '#CFCFCF',
             'font-family': 'HelveticaNeue',
             'font-size': '12px',        
@@ -379,8 +363,6 @@ def tracker_schedule_helper(data=[], id='tracker-presession-schedule', cell_bord
             'color': 'black',
             'whiteSpace': 'normal',
             'textAlign': 'center'
-            # 'height': 'auto',
-            # 'lineHeight': '15px'
         },    
         editable=False,
         style_as_list_view=True,
@@ -389,7 +371,6 @@ def tracker_schedule_helper(data=[], id='tracker-presession-schedule', cell_bord
     return deploy_schedule_table
 
 def focus_table_from_schedule(schedule):
-    # schedule = list(filter(lambda x: (x['length'] is not None),schedule))
     if len(schedule)==0:
         return []
     df = pd.DataFrame(schedule)
@@ -400,7 +381,6 @@ def focus_table_from_schedule(schedule):
     return focus_totals
     
 def task_table_from_schedule(schedule):
-    # schedule = list(filter(lambda x: (x['length'] is not None),schedule))
     if len(schedule)==0:
         return []
     df = pd.DataFrame(schedule)
@@ -428,7 +408,7 @@ def task_and_focus_tables_4_schedule_and_template(task_table_id, focus_table_id)
             'fontWeight': 'bold'
         },
         data=[],
-        style_cell={ #### FIX THIS UP!
+        style_cell={ 
                 'backgroundColor': '#CFCFCF',
                 'font-family': 'HelveticaNeue',
                 'font-size': '12px',        
@@ -493,9 +473,6 @@ def cumulative_focus_chart(timeline_or_schedule, title=''):
 
     task_focus_cum_list = [block['task']+": "+block['focus'] if ((block['focus'] is not None) and (block['focus'] is not '')) else block['task'] for block in data]
 
-    # old: runs into issue when focus is Nonetype
-    # task_focus_cum_list = [block['task']+": "+block['focus'] for block in data]
-
     for i in range(len(data)):
         data[i]['task']=task_focus_cum_list[i]
 
@@ -504,7 +481,6 @@ def cumulative_focus_chart(timeline_or_schedule, title=''):
 
     fig = cumulative_plot(data, title=title, tasks=unique_task_focus_pairs, cum_focus=True)
     return fig
-
 
 ############################################################################################################
 ####################################### HISTORY HELPERS ####################################################
@@ -579,7 +555,6 @@ def format_multi_session_task_lines(selected_sessions):
         for task in ['work', 'meditation','movement','break']+ ['total']:
             formatted_data_goals[task].append(session[task+'_goal'])         
     
-
     formatted_data_actual=dict(formatted_data_actual)
     formatted_data_goals=dict(formatted_data_goals)
     return formatted_data_actual, formatted_data_goals
@@ -686,12 +661,6 @@ def compute_individual_focus_data(schedule, timeline, tasks=['work', 'meditation
         sorted_output = sorted_output + list(filter(lambda x: x['task']==task, output))
 
     if len(sorted_output)==0: return []
-
-    # def convert_minutes_to_string(x):
-    #     actual_string=timedelta_to_string(datetime.timedelta(minutes=np.float64(x['actual'])))
-    #     goal_string=timedelta_to_string(datetime.timedelta(minutes=np.float64(x['goal'])))
-    #     x['result'] = actual_string+ " / "+goal_string 
-    #     return x
 
     data = list(map(convert_minutes_to_string, sorted_output))
     return data
@@ -849,7 +818,6 @@ def task_and_focus_table_4_history(task_table_id, focus_table_id):
         hidden_columns=['actual','goal'],
         style_data_conditional = [{'if': {'filter_query': '{task} = %()s' % {"": task}}, 'backgroundColor': colors[task],'color': 'black'} for task in ['work', 'meditation','movement', 'break']]+
             [{'if': {'filter_query': '{task} = %()s' % {"": stall}}, 'backgroundColor': colors[stall],'color': 'white'} for stall in ['hassler', 'pause']],
-            # [{'if': {'filter_query': stall},'backgroundColor': colors[stall],'color': 'white'} for stall in ['hassler', 'pause']],
         style_header={
             'backgroundColor': 'grey',
             'color' : 'black',
@@ -859,7 +827,7 @@ def task_and_focus_table_4_history(task_table_id, focus_table_id):
             'fontWeight': 'bold'
         },
         data=[],
-        style_cell={ #### FIX THIS UP!
+        style_cell={
                 'backgroundColor': '#CFCFCF',
                 'font-family': 'HelveticaNeue',
                 'font-size': '12px',        
@@ -947,12 +915,6 @@ def compute_multi_focus_data(full_sessions, tasks=['work', 'meditation', 'moveme
 
     if len(sorted_output)==0: return []
 
-    # def convert_minutes_to_string(x):
-    #     actual_string=timedelta_to_string(datetime.timedelta(minutes=np.float64(x['actual'])))
-    #     goal_string=timedelta_to_string(datetime.timedelta(minutes=np.float64(x['goal'])))
-    #     x['result'] = actual_string+ " / "+goal_string 
-    #     return x
-
     multi_focus_data = list(map(convert_minutes_to_string, sorted_output))
 
     return multi_focus_data
@@ -969,7 +931,6 @@ def convert_minutes_to_string(x):
 ############################################################################################################
 ##################################### MULTI TEMPLATE HELPERS ###############################################
 ############################################################################################################
-
 
 def multi_template_individual_task(schedule):
     schedule_df= pd.DataFrame(schedule)
@@ -1002,7 +963,6 @@ def task_and_focus_table_4_multi_templates(task_table_id, focus_table_id):
         hidden_columns=['numeric'],
         style_data_conditional = [{'if': {'filter_query': '{task} = %()s' % {"": task}}, 'backgroundColor': colors[task],'color': 'black'} for task in ['work', 'meditation','movement', 'break']]+
             [{'if': {'filter_query': '{task} = %()s' % {"": stall}}, 'backgroundColor': colors[stall],'color': 'white'} for stall in ['hassler', 'pause']],
-            # [{'if': {'filter_query': stall},'backgroundColor': colors[stall],'color': 'white'} for stall in ['hassler', 'pause']],
         style_header={
             'backgroundColor': 'grey',
             'color' : 'black',
@@ -1012,7 +972,7 @@ def task_and_focus_table_4_multi_templates(task_table_id, focus_table_id):
             'fontWeight': 'bold'
         },
         data=[],
-        style_cell={ #### FIX THIS UP!
+        style_cell={
                 'backgroundColor': '#CFCFCF',
                 'font-family': 'HelveticaNeue',
                 'font-size': '12px',        
@@ -1026,8 +986,6 @@ def task_and_focus_table_4_multi_templates(task_table_id, focus_table_id):
         },    
         css=[{"selector": ".show-hide", "rule": "display: none"}],
         row_deletable=True,
-        # row_selectable='multi',
-        # selected_rows=list(range(7)),
         editable=False,
         style_as_list_view=False,
         persistence=False,
@@ -1374,16 +1332,8 @@ individual_multiple_radio = html.Div(dcc.RadioItems(
     ],
     value='individual',
     labelStyle={'display': 'inline-block'}
-    ),
-    # style={
-    #     # 'text-align':'center',
-    #     # 'border': '1px solid black',
-    #     'margin-bottom':'2px',
-    #     'margin-top':'2px',
-    #     'width':'30%',
-    #     'margin-left': 'auto',
-    #     'margin-right': 'auto'}
-        )
+    )
+    )
 
 ### HISTORY INDIVIDUAL BUTTONS
 history_individual_buttons_html = html.Div(
@@ -1413,7 +1363,6 @@ history_date_and_delete = html.Div(
 
 delete_confirmation = dcc.ConfirmDialog(
         id='history-delete-selected-confirm',
-        # message='Danger danger! Are you sure you want to continue?',
     )
 
 ### MAIN HISTORY TABLE
@@ -1436,7 +1385,6 @@ history_table = dash_table.DataTable(
     selected_rows = [],
     style_data_conditional = [{'if': {'column_id': task},'backgroundColor': colors[task]} for task in tasks]+
         [{'if': {'column_id': stall},'color': 'white'} for stall in ['hassler', 'pause']],
-    # data=[{'work':'sd'},{'id':'somethin'}],
     style_header={
         'backgroundColor': 'grey',
         'color' : 'black',
@@ -1446,7 +1394,7 @@ history_table = dash_table.DataTable(
         'fontWeight': 'bold'
     },
 
-    style_cell={ #### FIX THIS UP!
+    style_cell={
             'backgroundColor': '#CFCFCF',
             'font-family': 'HelveticaNeue',
             'font-size': '12px',        
@@ -1476,7 +1424,6 @@ history_table_html = html.Div(
         'margin-top':'10px',
         'margin-bottom':'10px'})
 
-
 #### #### #### #### #### #### #### #### ####
 ### INDIVIDUAL ANALYSIS COMPONENTS: #### ###
 #### #### #### #### #### #### #### #### ####
@@ -1491,14 +1438,6 @@ history_individual_checklist = html.Div(dcc.Checklist(
         {'label': 'Schedule Focus Plot', 'value': 'schedule-focus'},
         {'label': 'Timeline Focus Plot', 'value': 'timeline-focus'},
     ],value=['summary-charts', 'summary-tables'],labelStyle={'display': 'inline-block'}),
-    # style={
-    #     # 'text-align':'center',
-    #     # 'border': '1px solid black',
-    #     # 'margin-bottom':'2px',
-    #     # 'margin-top':'2px',
-    #     'width':'30%',
-    #     'margin-left': 'auto',
-    #     'margin-right': 'auto'}
         )
 
 history_individual_controls_html = html.Div(
@@ -1691,8 +1630,6 @@ history_multi_task_and_focus_bar_charts_html = html.Div(
         html.Div([history_multi_focus_bar_chart], className="six columns"),
         ], className="row", style={'width':'90%','margin-left':'5%'})    
 
-
-
 ### INDIVIDUAL ANALAYSIS PAGE 
 individual_analysis_page_html = html.Div(
     id='individual-analysis-page', 
@@ -1731,8 +1668,6 @@ history_page = html.Div(children=[
     individual_analysis_page_html,
     multi_analysis_page_html
     ])
-
-
 
 ####################################################
 ####################################################
@@ -1815,12 +1750,10 @@ tracker_task_info_table = dash_table.DataTable(
             {'id': 'result', 'name': 'Result'},
             {'id': 'actual', 'name': 'actual'},
             {'id': 'goal', 'name': 'goal'},
-            # {'id': 'goal', 'name': 'Goal'},
             ],
     hidden_columns=['actual','goal'],
     style_data_conditional = [{'if': {'filter_query': '{task} = %()s' % {"": task}}, 'backgroundColor': colors[task],'color': 'black'} for task in ['work', 'meditation','movement', 'break']]+
         [{'if': {'filter_query': '{task} = %()s' % {"": stall}}, 'backgroundColor': colors[stall],'color': 'white'} for stall in ['hassler', 'pause']],
-        # [{'if': {'filter_query': stall},'backgroundColor': colors[stall],'color': 'white'} for stall in ['hassler', 'pause']],
     style_header={
         'backgroundColor': 'grey',
         'color' : 'black',
@@ -1830,7 +1763,7 @@ tracker_task_info_table = dash_table.DataTable(
         'fontWeight': 'bold'
     },
     data=[],
-    style_cell={ #### FIX THIS UP!
+    style_cell={ 
             'backgroundColor': '#CFCFCF',
             'font-family': 'HelveticaNeue',
             'font-size': '12px',        
@@ -1871,7 +1804,7 @@ tracker_focus_table = dash_table.DataTable(
         'fontWeight': 'bold'
     },
     data=[],
-    style_cell={ #### FIX THIS UP!
+    style_cell={ 
             'backgroundColor': '#CFCFCF',
             'font-family': 'HelveticaNeue',
             'font-size': '12px',        
@@ -1929,7 +1862,6 @@ tracker_buttons_html = html.Div(
         record_button_and_input
         ],
     style={ 'margin-top':'5px'}
-    # style={'width':'90%', 'text-align':'center','margin':'1px', 'display':'inline-block'}
     )
 
 tracker_session_zenmode_checklist = html.Div(dcc.Checklist(
@@ -1999,8 +1931,6 @@ input_hassler_html = html.Div(children=[
         },
 )
 
-
-
 block_page = html.Div(
     children=[
         # invisible stuff:
@@ -2032,8 +1962,6 @@ block_page = html.Div(
     )
 
 tracker_session_html = html.Div(children=[block_page, input_hassler_html], id='tracker-session-html')
-
-
 
 ####################################################################################################
 ####################################################################################################
@@ -2130,7 +2058,6 @@ tracker_presession_html = html.Div(
     ])
 ##################### 
 
-
 tracker_page = html.Div(
     # id='tracker-page',
     children=[
@@ -2140,8 +2067,6 @@ tracker_page = html.Div(
         ]
     )
 
-
-
 ##########################################################################################################
 ################################################ SCHEDULE ################################################
 ##########################################################################################################
@@ -2149,7 +2074,6 @@ tracker_page = html.Div(
 #############################################################################
 ############################# SCHEDULE - CUSTOM #############################
 #############################################################################
-
 
 schedule_custom_checklist = html.Div(dcc.Checklist(
     id='schedule-custom-checklist',
@@ -2173,15 +2097,7 @@ schedule_custom_task_and_focus_tables_html = html.Div(
         html.Div([schedule_focus_table], className="six columns"),
         ], className="row", style={'width':'90%','margin-left':'5%'})   
 
-initial_schedule = [{'task': 'work', 'length': 25, 'hassler': False, 'applause':True, 'focus': '', 'notes': ''},
-                    {'task': 'meditation', 'length': 5, 'hassler': False, 'applause':True, 'focus': '', 'notes': ''},
-                    {'task': 'work', 'length': 25, 'hassler': True, 'applause':True, 'focus': '', 'notes': ''},
-                    {'task': 'movement', 'length': 5, 'hassler': False, 'applause':True, 'focus': '', 'notes': ''},
-                    {'task': 'work', 'length': 25, 'hassler': True, 'applause':True, 'focus': '', 'notes': ''},
-                    {'task': 'meditation', 'length': 5, 'hassler': False, 'applause':True, 'focus': '', 'notes': ''},
-                    {'task': 'work', 'length': 25, 'hassler': True, 'applause':True, 'focus': '', 'notes': ''},
-                    {'task': 'break', 'length': 15, 'hassler': False, 'applause':True, 'focus': '', 'notes': ''},
-                    ]
+initial_schedule = PM_config.initial_schedule
 
 #### DASH EDITABLE TABLE ####
 schedule_table = dash_table.DataTable(
@@ -2288,13 +2204,11 @@ add_block_button = html.Button(children='Add Block', id='schedule-add-block', n_
 replicate_blocks_button = html.Button(children='Replicate Blocks', id='schedule-replicate-blocks', n_clicks_timestamp=-1)
 delete_selected_blocks_button = html.Button(children='Delete Selected', id='schedule-delete-selected', n_clicks_timestamp=-1)
 
-
 save_template_html = html.Div([
     html.Div(dcc.Input(id='save-template-name', type='text')),
     html.Div(html.Button(children='Save Template', id='schedule-save-template-button', n_clicks_timestamp=-1)),
     html.Div(id='schedule-save-template-result')],
     style={'width':'90%', 'text-align':'right'})
-
 
 deploy_schedule_button = html.Button(
     children='Deploy Schedule', 
@@ -2613,12 +2527,7 @@ templates_page_html = html.Div(
         
         template_init_html,
         templates_main_html,
-        # template_table,
-        # templates_task_and_focus_tables_html,
-        # template_task_chart_html,
-        # template_focus_chart_html,
 
-        # template_totals_table_html,
         hidden_div_5 ],style={'width':'90%', 'float':'left','margin':'30px', 'display':'inline-block'}) 
 
 #############################################################################
@@ -2718,10 +2627,6 @@ multi_template_list = dash_table.DataTable(
     # hidden_columns = [task+'_numeric' for task in ['work', 'meditation','movement','break']+['total']],
     data = [{},{}],
     selected_rows = [],
-    # style_data_conditional = [{'if': {'column_id': task},'backgroundColor': colors[task]} for task in tasks],
-    # dropdown={
-    #     'template_id': {'options' : [{'label': 'test template', 'value': 'test template'}, {'label': 'test', 'value': 'test'}, {'label': '1hr workout', 'value': '1hr workout'}, {'label': 'torbens template', 'value': 'torbens template'}, {'label': '1 2020-06-25: blah blah', 'value': '1 2020-06-25: blah blah'}, {'label': '8 2020-06-22: overnight test', 'value': '8 2020-06-22: overnight test'}, {'label': 'torbens template2', 'value': 'torbens template2'}]}
-    # },
     style_header={
         'backgroundColor': 'grey',
         'color' : 'black',
@@ -2749,10 +2654,7 @@ multi_template_list = dash_table.DataTable(
     },    
     # css=[{"selector": ".show-hide", "rule": "display: none"}],
     row_deletable=True,
-
-    # row_selectable=False,
     row_selectable='single',
-    # editable=True,
     style_as_list_view=True,
     persistence=True,
     )
@@ -2809,22 +2711,12 @@ multi_template_table = dash_table.DataTable(
 multi_template_list_html = html.Div(
     children=[multi_template_list],
     style={
-        # 'width':'30%', 
-        # 'display': 'inline-block',
-        # 'float':'right',
-        # 'margin-left': '10%',
-        # 'margin-right': 'auto',
         'margin-top':'10px',
         'margin-bottom':'10px'})
 
 multi_template_table_html = html.Div(
     children=[multi_template_table],
     style={
-        # 'width':'70%', 
-        # 'display': 'inline-block',
-        # 'float':'left',
-        # 'margin-left': '20%',
-        # 'margin-right': 'auto',
         'margin-top':'10px',
         'margin-bottom':'10px'})
 
@@ -2958,21 +2850,16 @@ dash_app.layout = html.Div(
             value="schedule-tab"
             ),
         ],
-        
-
     )
-
 
 ############################################################################################################
 ########################################### HISTORY CALLBACKS ##############################################
 ############################################################################################################
 
-
 ### HISTORY - REFRESH 
 @dash_app.callback(
     Output('my-date-picker-range', 'max_date_allowed'),
-    [Input('history-refresh-dates', 'n_clicks')]
-)
+    [Input('history-refresh-dates', 'n_clicks')])
 def history_refresh(n_clicks):
     tomorrow=datetime.datetime.now()
     return tomorrow
@@ -3050,12 +2937,9 @@ def save_schedule_to_templates(n_clicks, history_table, selected_rows):
     Output('history-individual-schedule-task-chart-html', 'style'),
     Output('history-individual-timeline-task-chart-html', 'style'),
     Output('history-individual-schedule-focus-chart-html', 'style'),
-    Output('history-individual-timeline-focus-chart-html', 'style'),
-    
-    ],
+    Output('history-individual-timeline-focus-chart-html', 'style'),],
     [Input('history-individual-checklist', 'value')],)
 def checklist_func(selected):
-
     chart_style_visible = {'width':'90%', 
             'display': 'block',
             'margin-left': 'auto',
@@ -3086,7 +2970,6 @@ def checklist_func(selected):
     else: 
         schedule_style = style_hidden
             
-
     if 'schedule-task' in selected:
         schedule_task_style = chart_style_visible
     else: 
@@ -3107,17 +2990,6 @@ def checklist_func(selected):
     else: 
         timeline_focus_style = style_hidden 
 
-
-
-    # if 'timeline-charts' in selected:
-    #     timeline_charts_style = {'width':'95%','margin-left':'2.5%'}
-    # else: 
-    #     timeline_charts_style = style_hidden 
-
-    # if 'schedule-charts' in selected:
-    #     schedule_charts_style = {'width':'95%','margin-left':'2.5%'}
-    # else: 
-    #     schedule_charts_style = style_hidden
     return bar_style, tables_style, schedule_style, schedule_task_style, timeline_task_style, schedule_focus_style, timeline_focus_style
 
 ## HISTORY - MULTI - CHECKLIST
@@ -3174,8 +3046,7 @@ def checklist_func(selected):
 
 # HISTORY - MAIN CALLBACK
 @dash_app.callback(
-    [
-    Output('history-table', 'row_selectable'),
+    [Output('history-table', 'row_selectable'),
 
     Output('individual-analysis-page', 'style'),
     Output('multi-analysis-page', 'style'),
@@ -3257,8 +3128,6 @@ def history_radio(
         if (len(selected_rows)==0) or (len(history_table) < selected_rows[0]):
             return 'single', style_hidden, style_hidden,empty_fig, empty_fig, empty_fig, empty_fig, [], [], [], empty_fig, empty_fig, [], [], [], [], empty_fig, empty_fig, style_hidden
         ####
-        # print('selected_rows: {}'.format(selected_rows[0]))
-        # print('history_table: {}'.format(history_table))
 
         session_date = history_table[selected_rows[0]]['session_date']
         session_id = history_table[selected_rows[0]]['session_id']
@@ -3308,7 +3177,6 @@ def history_radio(
         sesh = [history_table[j] for j in selected_rows]
         task_table_data = []
         for task in ['work','meditation','movement','break','total*','pause','hassler','total']:   
-        # for task in ['work', 'meditation', 'movement', 'break']:   
             row = {}
             
             row['task']=task
@@ -3374,18 +3242,8 @@ def history_radio(
                 row['goal']=0
             multi_task_data.append(row)
 
-        # def convert_minutes_to_string(x):
-        #     actual_string=timedelta_to_string(datetime.timedelta(minutes=np.float64(x['actual'])))
-        #     goal_string=timedelta_to_string(datetime.timedelta(minutes=np.float64(x['goal'])))
-        #     if x['task'] in ['pause', 'hassler']:
-        #         x['result'] = actual_string
-        #     else:     
-        #         x['result'] = actual_string+ " / "+goal_string 
-        #     return x
-
         multi_task_data = list(map(convert_minutes_to_string, multi_task_data))
         
-
         #### MULTI FOCUS DATA
         full_sessions=[]
         for session in selected_sessions:
@@ -3487,13 +3345,10 @@ def update_output(start_date, end_date, confirm_delete, select_all_check_list, s
     Output('history-individual-focus-bar-chart', 'figure'),
     [Input('history-individual-focus-table', 'data'),
     Input('history-individual-focus-table', 'selected_rows'),
-
-    Input('individual-bar-charts', 'style')
-    ],
+    Input('individual-bar-charts', 'style')],
     [State('history-table', 'selected_rows'),
     State('history-table', 'data'),])
 def task_table_to_bar_chart(data, selected_rows_focus_table, bar_style, selected_rows, history_table):
-    
     style_hidden={'display':'none'}
 
     if (bar_style==style_hidden) or (len(data)==0) or (len(selected_rows_focus_table)==0) or (len(data)<selected_rows_focus_table[0]) or (len(history_table)<selected_rows[0]): 
@@ -3529,14 +3384,10 @@ def task_table_to_bar_chart(data, selected_rows_focus_table, bar_style, selected
     Output('history-individual-task-bar-chart', 'figure'),
     [Input('history-individual-task-table', 'data'),
     Input('history-individual-task-table', 'selected_rows'),
-    
-    Input('individual-bar-charts', 'style')
-
-    ],
+    Input('individual-bar-charts', 'style')],
     [State('history-table', 'selected_rows'),
     State('history-table', 'data'),])
 def focus_table_to_bar_chart(data, selected_rows_task_table, bar_style, selected_rows, history_table):
-    
     style_hidden={'display':'none'}
 
     if (bar_style==style_hidden) or (len(data)==0) or (len(selected_rows_task_table)==0): 
@@ -3563,12 +3414,11 @@ def focus_table_to_bar_chart(data, selected_rows_task_table, bar_style, selected
 
 
  ### MULTI TASK BAR CHART
+
 @dash_app.callback(
     Output('history-multi-task-bar-chart', 'figure'),
     [Input('history-multi-task-table', 'data'),
-
     Input('multi-bar-charts', 'style'),
-
     Input('history-multi-task-table', 'selected_rows')],)
 def focus_table_to_bar_chart(data, bar_style, selected_rows):
     style_hidden={'display':'none'}
@@ -3590,9 +3440,7 @@ def focus_table_to_bar_chart(data, bar_style, selected_rows):
 @dash_app.callback(
     Output('history-multi-focus-bar-chart', 'figure'),
     [Input('history-multi-focus-table', 'data'),
-
     Input('multi-bar-charts', 'style'),
-
     Input('history-multi-focus-table', 'selected_rows')])
 def task_table_to_bar_chart(data, bar_style, selected_rows):
     style_hidden={'display':'none'}
@@ -3785,7 +3633,6 @@ def deploy_button_pressed(
         task_table_data = task_table_from_schedule(data)
         focus_table_data = focus_table_from_schedule(data)
         
-
         return data, presession_task_chart,'tracker-tab', True,  False, True, task_table_data, focus_table_data, [], [], True, [], go.Figure(), go.Figure()
 
     if button_id=='deploy-template-button':
@@ -3803,7 +3650,6 @@ def deploy_button_pressed(
             task_table_data = task_table_from_schedule(template_schedule_data)
             focus_table_data = focus_table_from_schedule(template_schedule_data)
             
-
             return template_schedule_data, presession_task_chart,'tracker-tab', True,  False, True, task_table_data, focus_table_data, [], [], True, [], go.Figure(), go.Figure()
     
     # PRESESSION EDIT BUTTON 
@@ -3892,8 +3738,6 @@ def disable_tabs(value):
             return [html.H3("{} IN SESSION!".format(wt.task.upper()))]
         else:
             return [html.H3("{} PAUSED!".format(wt.task.upper()))]
-    # elif  (wt.session_complete is True) and (value in ['schedule-tab', 'history-tab', 'friends-tab']):
-    #     return [html.H3('Deploy a schedule to start a session!')]
     else:
         return ['']
 
@@ -3918,11 +3762,8 @@ def display_confirm(n_clicks):
     Input('schedule-custom-focus-chart-html', 'style'),
     
     ])
-def update_custom_schedule_plot(schedule, summary_tables_style, task_style, focus_style):
-    
+def update_custom_schedule_plot(schedule, summary_tables_style, task_style, focus_style):    
     schedule = list(filter(lambda x: (x['length'] is not ''),schedule))
-    
-    # print(schedule[0]['length'] is '')
 
     style_hidden={'display':'none'}
     empty_fig = go.Figure()
@@ -3949,8 +3790,6 @@ def update_custom_schedule_plot(schedule, summary_tables_style, task_style, focu
 
 ### SAVE TEMPLATE BUTTON
 @dash_app.callback(
-    # [Output('schedule-save-template-result', 'children'),
-    # Output('save-template-name', 'value')],
     Output('schedule-save-template-result', 'children'),
     [Input('schedule-save-template-button', 'n_clicks')],
     [State('save-template-name', 'value'),
@@ -3988,12 +3827,8 @@ def finish_and_record(n_clicks):
         button_id = ''
     else:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
     if button_id=='multi-template-refresh-button':
         wt.get_templates()
-        options = [{'label': template, 'value': template} for template in wt.template_names]
-    else: 
-        wt.get_templates(audio=False)
     options = [{'label': template, 'value': template} for template in wt.template_names]
     output= {'template_id': {'options' : options}}
 
@@ -4045,7 +3880,6 @@ def multi_template_table(data, summary_tables_style):
     Output('multi-temp-cum-focus-chart', 'figure'),] ,  
 
     [Input('multi-template-list', 'data'),
-    # Input('multi-temp-summary-tables' 'style'),
     Input('multi-temp-dist-task-chart-html', 'style'),
     Input('multi-temp-cum-task-chart-html', 'style'),
     Input('multi-temp-dist-focus-chart-html', 'style'),
@@ -4135,12 +3969,10 @@ def selected_row(selected_rows, data_list):
 
 ### MULTI TEMP INDIVIDUAL TEMPLATE VIEW
 @dash_app.callback(
-    [
-    Output('multi-temp-individual-task-table','data'),
+    [Output('multi-temp-individual-task-table','data'),
     Output('multi-temp-individual-focus-table','data'),
     Output('multi-temp-individual-task-chart','figure'),
-    Output('multi-temp-individual-focus-chart','figure')
-    ],
+    Output('multi-temp-individual-focus-chart','figure')],
     [Input('multi-temp-schedule','data'),
     Input('multi-temp-individual-summary-tables-html', 'style'),
     Input('multi-temp-individual-task-chart-html', 'style'),
@@ -4168,7 +4000,6 @@ def selected_row(data, summary_tables_style, task_chart_style, focus_chart_style
         focus_chart=go.Figure()
 
     return task_table_data, focus_table_data, task_chart, focus_chart
-    # return task_table_data, focus_table_data,  task_chart
 
 # MULTI TEMP CHEKLIST
 @dash_app.callback(
@@ -4331,7 +4162,6 @@ def save_templates_confirm(submit_n_clicks, primary_name, template_list):
         else:
             wt.system_wrapper('say "there was an issue with saving."'.format(len(template_ids)))
             return ["issue with saving some templates :("]
-
     else:
         return ['']
 
@@ -4380,7 +4210,6 @@ def templates_checklist(value):
         schedule_focus_chart_style = style_visible
     if 'tracker-schedule' in value:
         schedule_style = style_visible
-    
 
     return bar_charts_style, summary_tables_style ,timeline_task_chart_style, timeline_focus_chart_style, schedule_task_chart_style, schedule_focus_chart_style, schedule_style
     
@@ -4445,8 +4274,9 @@ def finish_and_record(n_clicks):
         return True
 
 ### NEXT BUTTON
-@dash_app.callback(Output('hidden-div', 'children'),
-              [Input('tracker-next', 'n_clicks')])
+@dash_app.callback(
+    Output('hidden-div', 'children'),
+    [Input('tracker-next', 'n_clicks')])
 def next_button_callback(n_clicks):
     ctx = dash.callback_context
     if not ctx.triggered:
@@ -4460,8 +4290,6 @@ def next_button_callback(n_clicks):
 ### INFO INTERVAL
 @dash_app.callback(
     [Output('current-info-html', 'children'),
-    # Output('info-table-html', 'children'),
-    # Output('session-info-table', 'data'),
 
     Output('tracker-task-table', 'data'),
     Output('tracker-focus-table', 'data'),
@@ -4591,7 +4419,6 @@ def interval_charts(
     else: 
         timeline_focus_chart = empty_fig
     
-
     if (bar_style==style_hidden) or (len(task_selected_rows)==0) or (sum([j>=len(task_table) for j in task_selected_rows])>0):
         task_bar_chart = empty_fig
     else: 
@@ -4624,7 +4451,7 @@ def interval_charts(
     [Input('interval-hassler', 'n_intervals')],
     [State('input-hassler', 'value'),]
     )
-def sdfs(n_intervals, value):
+def hassler_input_interval(n_intervals, value):
     if wt.hassler_status == True:
         return value
     else: 
@@ -4635,7 +4462,7 @@ def sdfs(n_intervals, value):
     Output('hidden-div-3', 'children'),
     [Input('input-hassler', 'value')]
     )
-def ssdfsdfdfs(value):
+def hassler_input(value):
     wt.set_input_from_dash(value)
     return ['']
 
@@ -4682,14 +4509,9 @@ def finish_and_record(n_clicks):
         button_id = ''
     else:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
     if button_id=='refresh-templates-button':
         wt.get_templates()
-        # options = [{'label': template, 'value': template} for template in wt.template_names]
-    # else: 
-    #     wt.get_templates(audio=False)
     options = [{'label': template, 'value': template} for template in wt.template_names]
-
     return options
 
 # #### DELETE TEMPLATE DIALOG
@@ -4703,7 +4525,6 @@ def delete_template_dialog(submit_n_clicks, value):
         button_id = ''
     else:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
     if (button_id=='confirm-delete') and (value is not None):
         wt.delete_template(value)
         wt.get_templates(audio=False)
@@ -4729,22 +4550,15 @@ def finish_and_record(n_clicks):
 @dash_app.callback(
     [Output('template-schedule', 'data'),
     Output('template-task-chart', 'figure'),
-
     Output('template-focus-chart', 'figure'),
-    
     Output('template-task-table', 'data'),
     Output('template-focus-table', 'data'),
-
     Output('template-init-html', 'hidden'),
-    Output('schedule-templates-main', 'hidden'),    
-    
-    ],
+    Output('schedule-templates-main', 'hidden'),],
     [Input('templates-dropdown', 'value'),
-
     Input('template-task-chart-html', 'style'),
     Input('template-summary-table-html', 'style'),
     Input('template-focus-chart-html', 'style'),]
-
     )
 def template_update(
     value, 
@@ -4793,8 +4607,9 @@ def template_update(
 
 if __name__ == '__main__':
 
-    PM_config.postgres_startup()  
+    
     wt = work_timer(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
+    wt.postgres_startup()  
     t=threading.Thread(name="input", target=wt.get_input, daemon=True)
     t.start()
     dash_app.run_server(host='127.0.0.1', port=8080, debug=True)
