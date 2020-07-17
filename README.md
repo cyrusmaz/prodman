@@ -88,7 +88,7 @@ TODO
 **glass.aiff** is the ding sound effect. Replace with your own sound effect if desired.
 
 # Installation
-prodman is written entirely in Python. Furthermore, prodman stores historical records and saved templates on a Postgres server in a Docker container. 
+prodman is written entirely in Python. Furthermore, prodman stores historical records and saved templates on a Postgres server in a Docker container. Thus, using prodman requires the Python interpreter (I use 3.7) and several dependencies, as well as Docker and Postgres. 
 
 ### Python & Dependencies
 Install Python: https://www.python.org/downloads/
