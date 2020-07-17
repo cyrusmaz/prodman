@@ -1884,7 +1884,7 @@ tracker_session_checklist = html.Div(dcc.Checklist(
         {'label': 'Schedule', 'value': 'tracker-schedule'},
 
     ],
-    value=['summary-tables', 'summary-bars'],
+    value=['summary-tables'],
     labelStyle={'display': 'inline-block'}
     ),
     style={'text-align':'center', 'margin-top':'5px', 'margin-bottom':'5px'})
@@ -4607,10 +4607,9 @@ def template_update(
 
 if __name__ == '__main__':
 
-    
     wt = work_timer(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
     wt.postgres_startup()  
     t=threading.Thread(name="input", target=wt.get_input, daemon=True)
     t.start()
-    dash_app.run_server(host='127.0.0.1', port=8080, debug=True)
+    dash_app.run_server(host='127.0.0.1', port=PM_config.dash_app_port, debug=True)
 
