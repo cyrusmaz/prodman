@@ -129,8 +129,15 @@ In Terminal, traverse to where *PM_db_init.py* is saved, and type the following:
 
 > python3 PM_db_init.py
 
-This will give an error because this script both starts a Postgres server in a Docker container, AND initializes the database, and firing up the Docker container takes a bit of time. Hence, wait a minute or so and run the same command again. If you encounter the same error, wait a few moments and try again. Once the command runs without error, you are all set!
+You will get an error the first time you run the script because it both starts a Postgres server in a Docker container, AND initializes the database; moreover firing up the Docker container takes a bit of time, and the initialization cannot take place until the Postgres server is fully fired up in the container. Hence, wait a minute or so and run the same command again. If you encounter the same error, wait a few moments and try again. Once the command runs without error, you are all set!
 
+# Starting Up The Application
+
+In Terminal, traverse to where *PM_main.py* is saved, and type the following: 
+
+> python3 PM_main.py
+
+then copy the link that it provides (default is: http://127.0.0.1:8080/), and paste it in your browser. Et voilà!
 
 # Caveats
 Currently unable to jump to next block while paused. 
