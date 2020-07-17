@@ -133,11 +133,20 @@ You will get an error the first time you run the script because it both starts a
 
 # Starting Up The Application
 
+### In Terminal:
+
 In Terminal, traverse to where *PM_main.py* is saved, and type the following: 
 
 > python3 PM_main.py
 
 then copy the link that it provides (default is: http://127.0.0.1:8080/), and paste it in your browser. Et voilà!
+
+### As Clickable Bash Script:
+Edit *prodman_startup* so that the path to *PM_main.py* is correct. Then, make the bash script exectutable by typing the following in Terminal: 
+
+>chmod 755 /path/to/prodman_startup
+
+Now prodman may be started by clicking *prodman_startup* in Finder!
 
 # Caveats
 Currently, unable to jump to next block while paused. 
