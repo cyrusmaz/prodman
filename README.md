@@ -140,7 +140,9 @@ In Terminal, traverse to where *PM_main.py* is saved, and type the following:
 then copy the link that it provides (default is: http://127.0.0.1:8080/), and paste it in your browser. Et voilà!
 
 # Caveats
-Currently unable to jump to next block while paused. 
+Currently, unable to jump to next block while paused. 
+
+Currently, the docker container continues to run even after prodman has been exited. 
 
 # Acknowledgement
 This application was inspired by the works of James Clear (https://jamesclear.com/habit-tracker) and Scott Young (https://www.scotthyoung.com/blog/ultralearning). 
