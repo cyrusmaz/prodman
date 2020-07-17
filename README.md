@@ -146,7 +146,9 @@ Edit *prodman_startup* so that the path to *PM_main.py* is correct. Then, make t
 
 >chmod 755 /path/to/prodman_startup
 
-Now prodman may be started by clicking *prodman_startup* in Finder!
+The steps above need to be completed only once. 
+
+Now you may click *prodman_startup*, copy the link that it provides (default is: http://127.0.0.1:8080/), and paste it in your browser. Et voilà!
 
 # Caveats
 Currently, unable to jump to next block while paused. 
