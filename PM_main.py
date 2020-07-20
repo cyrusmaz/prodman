@@ -1916,12 +1916,12 @@ hidden_div_4 = html.Div(id='hidden-div-4', style={'display':'none'})
 hidden_div_5 = html.Div(id='hidden-div-5', style={'display':'none'})
 
 interval_charts = dcc.Interval(id='interval-charts', interval=10000)
-interval_hassler = dcc.Interval(id='interval-hassler', interval=1000)
+# interval_hassler = dcc.Interval(id='interval-hassler', interval=1000)
 interval_info = dcc.Interval(id='interval-info', interval=1000)
 
 input_hassler = dcc.Input(id="input-hassler", type="text", placeholder="", persistence=False, persisted_props=[], autoFocus=True)
 input_hassler_html = html.Div(children=[
-    html.H4("Type 'okay' here:"),
+    html.H4("To begin next block, type 'okay' below:"),
     html.Div(children=input_hassler),
     html.Button(children='Submit', id='hassler-submit-button', n_clicks=0, autoFocus=True, style={'margin':'10px'})
     ], 
@@ -1942,7 +1942,7 @@ block_page = html.Div(
         hidden_div_3,
         hidden_div_4,
         interval_charts,
-        interval_hassler,
+        # interval_hassler,
         interval_info,
 
         # visible stuff: 
@@ -4296,7 +4296,10 @@ def next_button_callback(n_clicks):
     Output('tracker-focus-table', 'data'),
     
     Output('tracker-start-button', 'children'),
-    Output('interval-hassler', 'disabled'),
+    
+    # Output('interval-hassler', 'disabled'),
+
+
     Output('input-hassler-html', 'hidden'),
     Output('block-page', 'hidden'),
     Output('tracker-session-schedule', 'style_data_conditional')],
@@ -4316,11 +4319,11 @@ def interval_info(n_intervals, zen_value):
             pause_button = "Pause"
 
     if wt.hassler_status is True:
-        interval_hassler = False
+        # interval_hassler = False
         input_hassler_html = False
         block_page = True
     else: 
-        interval_hassler = True
+        # interval_hassler = True
         input_hassler_html = True
         block_page = False
 
@@ -4348,9 +4351,8 @@ def interval_info(n_intervals, zen_value):
     session_schedule_style_output = [{'if': {'filter_query': '{task} = %()s' % {"": task}}, 'backgroundColor': colors[task],'color': 'black'} for task in tasks]
     session_schedule_style_output.append({'if': {'row_index': wt.current_block_index},'font-size': '30px'})
 
-
-    # return current_info_html, session_info_table_data, output, focus_table_data, pause_button, interval_hassler, input_hassler_html, block_page
-    return current_info_html, output, focus_table_data, pause_button, interval_hassler, input_hassler_html, block_page, session_schedule_style_output
+    return current_info_html, output, focus_table_data, pause_button, input_hassler_html, block_page, session_schedule_style_output
+    # return current_info_html, output, focus_table_data, pause_button, interval_hassler, input_hassler_html, block_page, session_schedule_style_output
 
 ### DISABLE INFO INTERVAL IF CHARTS INTERVAL IS DISABLED
 @dash_app.callback(
