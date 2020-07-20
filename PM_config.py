@@ -1,6 +1,6 @@
 ## FILE/DIRECTORY LOCATIONS:
 # sound:
-applause_sound_location='/Users/user/Documents/PYTHON_PROJECTS/PM_local/applaud.aiff',
+applause_sound_location='/Users/user/Documents/PYTHON_PROJECTS/PM_local/applaud.aiff'
 ding_sound_location='/Users/user/Documents/PYTHON_PROJECTS/PM_local/ding.wav'
 
 # database:

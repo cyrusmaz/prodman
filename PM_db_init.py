@@ -1,12 +1,11 @@
 from sqlalchemy import text, create_engine
 import os
 
-# CUSTOM SCRIPT:
-import config
+import PM_config
 
-config.postgres_startup()
+PM_config.postgres_startup()
 
-db_string = 'postgresql://postgres:docker@localhost:{}/postgres'.format(config.pg_local_port)
+db_string = 'postgresql://postgres:docker@localhost:{}/postgres'.format(PM_config.pg_local_port)
 engine = create_engine(db_string)
 connection = engine.connect()
 

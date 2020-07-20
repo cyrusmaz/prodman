@@ -1919,10 +1919,11 @@ interval_charts = dcc.Interval(id='interval-charts', interval=10000)
 interval_hassler = dcc.Interval(id='interval-hassler', interval=1000)
 interval_info = dcc.Interval(id='interval-info', interval=1000)
 
-input_hassler = dcc.Input(id="input-hassler", type="text", placeholder="", persistence=False, autoFocus=True)
+input_hassler = dcc.Input(id="input-hassler", type="text", placeholder="", persistence=False, persisted_props=[], autoFocus=True)
 input_hassler_html = html.Div(children=[
-    html.H4("Type Here:"),
-    html.Div(children=input_hassler)
+    html.H4("Type 'okay' here:"),
+    html.Div(children=input_hassler),
+    html.Button(children='Submit', id='hassler-submit-button', n_clicks=0, autoFocus=True, style={'margin':'10px'})
     ], 
     id='input-hassler-html',
     style={
@@ -4445,26 +4446,36 @@ def interval_charts(
 
     return timeline_task_chart, timeline_focus_chart, task_bar_chart, focus_bar_chart
 
-### HASSLER INPUT INTERVAL
+
 @dash_app.callback(
     Output('input-hassler', 'value'),
-    [Input('interval-hassler', 'n_intervals')],
+    [Input('hassler-submit-button', 'n_clicks')],
     [State('input-hassler', 'value'),]
-    )
-def hassler_input_interval(n_intervals, value):
-    if wt.hassler_status == True:
-        return value
-    else: 
-        return ''
-
-### HASSLER INPUT
-@dash_app.callback(
-    Output('hidden-div-3', 'children'),
-    [Input('input-hassler', 'value')]
-    )
-def hassler_input(value):
+)
+def hassler_input_button(n_clicks, value):
     wt.set_input_from_dash(value)
-    return ['']
+    return ''
+
+# ### HASSLER INPUT INTERVAL
+# @dash_app.callback(
+#     Output('input-hassler', 'value'),
+#     [Input('interval-hassler', 'n_intervals')],
+#     [State('input-hassler', 'value'),]
+#     )
+# def hassler_input_interval(n_intervals, value):
+#     if wt.hassler_status == True:
+#         return value
+#     else: 
+#         return ''
+
+# ### HASSLER INPUT
+# @dash_app.callback(
+#     Output('hidden-div-3', 'children'),
+#     [Input('input-hassler', 'value')]
+#     )
+# def hassler_input(value):
+#     wt.set_input_from_dash(value)
+#     return ['']
 
 ######################################################################################################################################################
 ############################################################## TEMPLATES CALLBACKS ###################################################################
@@ -4607,7 +4618,7 @@ def template_update(
 
 if __name__ == '__main__':
 
-    wt = work_timer(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
+    wt = prodman_backend(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
     wt.postgres_startup()  
     t=threading.Thread(name="input", target=wt.get_input, daemon=True)
     t.start()

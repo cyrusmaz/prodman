@@ -11,7 +11,7 @@ from functools import reduce
 import PM_config
 
 
-class work_timer:
+class prodman_backend:
     def __init__(self, applause_sound_location,ding_sound_location):
 
         self.applause_sound_location = applause_sound_location
@@ -210,6 +210,7 @@ class work_timer:
     def get_input(self):
         while True:
             self.user_input = input()
+            print("wt.get_input() just set wt.user_input to {}".format(self.user_input))
             if self.user_input == "pause":
                 self.pause = True
                 self.counts['pause'] += 1
@@ -272,7 +273,6 @@ class work_timer:
         check_container = 'docker container inspect {} > /dev/null 2>&1 || '.format(PM_config.postgres_container_name)
         # fire up postgres in a docker container if there is currently no docker container by the name of postgres_container_name
         os.system(check_container+docker_shell_command)
-
 
     def get_history(self, start_date, end_date):
         pg_local_port='5430'
@@ -702,7 +702,7 @@ class work_timer:
 # if __name__ == "__main__":
 
 #     schedule = [
-#         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':'next', 'focus': 'standing', 'notes': ''},
+#         {'task': 'work',        'length': 15, 'hassler': True, 'applause':True, 'dinger':'next', 'focus': 'standing', 'notes': ''},
 #         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':5, 'focus': 'standing', 'notes': ''},
 #         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':None, 'focus': 'standing', 'notes': ''},
 #         {'task': 'work',        'length': 15, 'hassler': False, 'applause':True, 'dinger':0.1, 'focus': 'standing', 'notes': ''},
@@ -711,7 +711,7 @@ class work_timer:
 
 # ####################################################################################
 
-#     wt = work_timer(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
+#     wt = prodman_backend(applause_sound_location=PM_config.applause_sound_location, ding_sound_location=PM_config.ding_sound_location)
 #     wt.set_schedule(schedule)
 #     t=threading.Thread(name="input", target=wt.get_input, daemon=True)
 #     t.start()
