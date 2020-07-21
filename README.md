@@ -153,7 +153,7 @@ Now you may click *prodman_startup*, copy the link that it provides (default is:
 # Caveats
 Currently, unable to jump to next block while paused. 
 
-Currently, the docker container continues to run even after prodman has been exited. 
+The docker container continues to run even after prodman has been exited. 
 
 # Acknowledgement
 This application was inspired by the works of James Clear (https://jamesclear.com/habit-tracker) and Scott Young (https://www.scotthyoung.com/blog/ultralearning). 
