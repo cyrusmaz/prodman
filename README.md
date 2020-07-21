@@ -70,7 +70,7 @@ TODO
 1. PM_backend.py
 1. PM_db_init.py
 1. applaud.aiff
-1. glass.aiff
+1. ding.wav
 
 **PM_config.py** contains the configuration parameters. The following paths **must** be set by the user: 
 - applause_sound_location 
@@ -85,7 +85,7 @@ TODO
 
 **applaud.aiff** is the applaud sound effect. Replace with your own sound effect if desired.
 
-**glass.aiff** is the ding sound effect. Replace with your own sound effect if desired.
+**ding.wav** is the ding sound effect. Replace with your own sound effect if desired.
 
 # Installation
 prodman is written entirely in Python. Furthermore, prodman stores historical records and saved templates on a Postgres server in a Docker container. Thus, using prodman requires the Python interpreter (I use 3.7) and several dependencies, as well as Docker and Postgres. 
