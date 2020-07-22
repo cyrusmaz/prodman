@@ -155,5 +155,7 @@ Currently, unable to jump to next block while paused.
 
 The docker container continues to run even after prodman has been exited. 
 
+Session name and template name cannot contain apostrophes.
+
 # Acknowledgement
 This application was inspired by the works of James Clear (https://jamesclear.com/habit-tracker) and Scott Young (https://www.scotthyoung.com/blog/ultralearning). 
