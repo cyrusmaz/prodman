@@ -1854,6 +1854,7 @@ record_button_and_input = html.Div(children=[
     record_button],
     style={'margin':'2px'})
 
+
 tracker_buttons_html = html.Div(
     children=[
         start_button,
@@ -1870,7 +1871,8 @@ tracker_session_zenmode_checklist = html.Div(dcc.Checklist(
     value=[],
     labelStyle={'display': 'inline-block'}
     ),
-    style={'text-align':'center'})
+    style={'text-align':'center'}
+    )
 
 tracker_session_checklist = html.Div(dcc.Checklist(
     id='tracker-session-checklist',
@@ -1914,6 +1916,9 @@ hidden_div_2 = html.Div(id='hidden-div-2', style={'display':'none'})
 hidden_div_3 = html.Div(id='hidden-div-3', style={'display':'none'})
 hidden_div_4 = html.Div(id='hidden-div-4', style={'display':'none'})
 hidden_div_5 = html.Div(id='hidden-div-5', style={'display':'none'})
+hidden_div_6 = html.Div(id='hidden-div-6', style={'display':'none'})
+hidden_div_7 = html.Div(id='hidden-div-7', style={'display':'none'})
+hidden_div_8 = html.Div(id='hidden-div-8', style={'display':'none'})
 
 interval_charts = dcc.Interval(id='interval-charts', interval=10000)
 # interval_hassler = dcc.Interval(id='interval-hassler', interval=1000)
@@ -2826,6 +2831,77 @@ schedule_tabs = dcc.Tabs(
     style=tabs_styles)    
 
 
+#############################################################################
+############################### SETTINGS TAB  ###############################
+#############################################################################
+
+
+vocal_slider = html.Div(dcc.Slider(
+    id='volume-slider-vocal',
+    min=0,
+    max=100,
+    value=PM_config.say_vol_init,
+    marks={
+        0: {'label': 'Mute', 'style': {'color': 'grey'}},
+        100: {'label': 'Max', 'style': {'color': 'red'}}
+    },
+    included=True))
+
+settings_vocal_volume_html = html.Div(
+    children=[
+        html.Div(["Vocal cues volume:", ],style={'width':'15%','float':'left'}),
+        html.Div([vocal_slider],style={'width':'30%','float':'left'}),
+        ], className="row", style={'width':'90%','margin-left':'5%'})   
+
+
+ding_slider = html.Div(dcc.Slider(
+    id='volume-slider-ding',
+    min=0,
+    max=100,
+    value=PM_config.ding_vol_init,
+    marks={
+        0: {'label': 'Mute', 'style': {'color': 'grey'}},
+        100: {'label': 'Max', 'style': {'color': 'red'}}
+    },
+    included=True))
+
+settings_ding_volume_html = html.Div(
+    children=[
+        html.Div(["Ding volume:", ],style={'width':'15%','float':'left'}),
+        html.Div([ding_slider],style={'width':'30%','float':'left'}),
+        ], className="row", style={'width':'90%','margin-left':'5%'})   
+
+
+applause_slider = html.Div(dcc.Slider(
+    id='volume-slider-applause',
+    min=0,
+    max=100,
+    value=PM_config.applause_vol_init,
+    marks={
+        0: {'label': 'Mute', 'style': {'color': 'grey'}},
+        100: {'label': 'Max', 'style': {'color': 'red'}}
+    },
+    included=True))
+
+settings_applause_volume_html = html.Div(
+    children=[
+        html.Div(["Applause volume:", ],style={'width':'15%','float':'left'}),
+        html.Div([applause_slider],style={'width':'30%','float':'left'}),
+        ], className="row", style={'width':'90%','margin-left':'5%'})   
+
+settings_page = html.Div(
+    children=[
+        settings_vocal_volume_html,
+        settings_ding_volume_html,
+        settings_applause_volume_html,
+        hidden_div_6,
+        hidden_div_7,
+        hidden_div_8
+    ],
+    style={'margin':'10px'})
+
+
+
 ##########################################################################################################
 ############################################### APP LAYOUT ###############################################
 ##########################################################################################################
@@ -2843,7 +2919,7 @@ dash_app.layout = html.Div(
                 dcc.Tab(label='Tracker', id="tracker-tab", value="tracker-tab", children=[tracker_page], style=tab_style, selected_style=tab_selected_style, disabled_style=tab_disabled_style),
                 dcc.Tab(label='Schedule', id="schedule-tab", value="schedule-tab", children=[schedule_tabs], style=tab_style, selected_style=tab_selected_style, disabled_style=tab_disabled_style),
                 dcc.Tab(label='History', id="history-tab", value="history-tab", children=[history_page], style=tab_style, selected_style=tab_selected_style, disabled_style=tab_disabled_style),
-                # dcc.Tab(label='Friends', id="friends-tab", value="friends-tab", children=[], style=tab_style, selected_style=tab_selected_style, disabled_style=tab_disabled_style),
+                dcc.Tab(label='Settings', id="settings-tab", value="settingse-tab", children=[settings_page], style=tab_style, selected_style=tab_selected_style, disabled_style=tab_disabled_style),
             ],
             mobile_breakpoint=0,
             persistence=True,
@@ -3734,7 +3810,7 @@ def deploy_button_pressed(
     [Output('above-tabs-info','children')],
     [Input('all-tabs', 'value'),],)
 def disable_tabs(value):
-    if (wt.session_complete is False) and (value in ['schedule-tab', 'history-tab', 'friends-tab']) and (wt.task is not None):
+    if (wt.session_complete is False) and (value not in ['tracker-tab']) and (wt.task is not None):
         if wt.pause is False:
             return [html.H3("{} IN SESSION!".format(wt.task.upper()))]
         else:
@@ -4299,7 +4375,6 @@ def next_button_callback(n_clicks):
     
     # Output('interval-hassler', 'disabled'),
 
-
     Output('input-hassler-html', 'hidden'),
     Output('block-page', 'hidden'),
     Output('tracker-session-schedule', 'style_data_conditional')],
@@ -4613,6 +4688,32 @@ def template_update(
     
 
     return schedule, task_chart, focus_chart, task_table_data, focus_table_data, True, False
+
+######################################################################################################################################################
+############################################################## SETTINGS CALLBACKS ###################################################################
+######################################################################################################################################################
+
+@dash_app.callback(
+    Output('hidden-div-6', 'children'),
+    [Input('volume-slider-vocal', 'value')])
+def say_volume(value):
+    wt.set_volume('say', value)
+    return ''
+
+
+@dash_app.callback(
+    Output('hidden-div-7', 'children'),
+    [Input('volume-slider-ding', 'value')])
+def say_volume(value):
+    wt.set_volume('ding', value)
+    return ''
+
+@dash_app.callback(
+    Output('hidden-div-8', 'children'),
+    [Input('volume-slider-applause', 'value')])
+def say_volume(value):
+    wt.set_volume('applause', value)
+    return ''
 
 ############################################################################################################################################################
 ############################################################################################################################################################

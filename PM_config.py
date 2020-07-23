@@ -19,6 +19,12 @@ initial_schedule = [
     {'task': 'work', 'length': 25, 'hassler': True, 'applause':True, 'dinger':None , 'focus': '', 'notes': ''},
     {'task': 'break', 'length': 15, 'hassler': False, 'applause':True, 'dinger':None , 'focus': '', 'notes': ''}]
 
+# INITIAL VOLUMES:
+say_vol_init = 50
+ding_vol_init = 50
+applause_vol_init = 50
+
+
 ## DOCKER SETTINGS:
 pg_local_port = '5430'
 pg_docker_port = '5432'
