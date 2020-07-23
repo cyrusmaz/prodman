@@ -40,7 +40,6 @@ class prodman_backend:
         self.block_time_elapsed = None
         self.block_time_remaining = None
         
-
         self.timeline = [] # list of dicts: 
  
         self.session_start_time = None
@@ -52,7 +51,18 @@ class prodman_backend:
         self.template_names = []
         self.templates_dict = []
         self.selected_history = []
+
+        self.say_volume = 1
+        self.ding_volume = 1
+        self.applause_volume = 1
         
+    def set_volume(self, id, value):
+        if id=='say':
+            self.say_volume = value/100
+        if id=='ding':
+            self.ding_volume = value*5/100
+        if id=='applause':
+            self.applause_volume = value*5/100
 
     def set_schedule(self,schedule):
         # print(schedule)
@@ -116,7 +126,8 @@ class prodman_backend:
                 break
             self.current_block_index += 1   
         self.session_complete = True
-        self.system_wrapper('say ", session completed!"')
+        # self.system_wrapper('say ", session completed!"')
+        self.system_wrapper_say('session completed!')
         print("SESSION COMPLETED!")
         
     def return_progress(self):
@@ -206,7 +217,6 @@ class prodman_backend:
         if dash_input == "record":
             self.record_session() 
   
-
     def get_input(self):
         while True:
             self.user_input = input()
@@ -293,7 +303,8 @@ class prodman_backend:
 
         if (template_id =='') or ('"' in template_id) or ("'" in template_id):
             if vocalize is not False:
-                self.system_wrapper('say "template name cannot be blank!"')
+                # self.system_wrapper('say "template name cannot be blank!"')
+                self.system_wrapper_say("template name cannot be blank!")
             return 'invalid name'
 
         if template_id in self.template_names:
@@ -324,9 +335,11 @@ class prodman_backend:
         engine.dispose()
         if vocalize is not False:
             if output_string == "saved":
-                self.system_wrapper('say "template saved!"')
+                # self.system_wrapper('say "template saved!"')
+                self.system_wrapper_say('template saved!')
             if output_string == "overwritten":
-                self.system_wrapper('say "template overwritten!"')
+                # self.system_wrapper('say "template overwritten!"')
+                self.system_wrapper_say('template overwritten!')
 
         return output_string
 
@@ -343,7 +356,8 @@ class prodman_backend:
         templates_list = connection.execute(templates_list_query)
         engine.dispose()
         if audio==True:
-            self.system_wrapper('say "templates list refreshed!"')
+            # self.system_wrapper('say "templates list refreshed!"')
+            self.system_wrapper_say('templates list refreshed!')
         templates_list = list(templates_list)
 
         self.templates_dict = {template[0] : template[1] for template in templates_list}
@@ -362,7 +376,8 @@ class prodman_backend:
 
         connection.execute(delete_statement)
         engine.dispose()   
-        self.system_wrapper('say "template deleted!"')     
+        # self.system_wrapper('say "template deleted!"')  
+        self.system_wrapper_say('template deleted!')   
 
     def delete_from_history(self, session_dates, session_ids):
         pg_local_port='5430'
@@ -379,9 +394,11 @@ class prodman_backend:
 
         connection.execute(query_string)
         if len(session_dates)==1:
-            self.system_wrapper('say "1 session deleted"')
+            # self.system_wrapper('say "1 session deleted"')
+            self.system_wrapper_say('one session deleted!')
         else:    
-            self.system_wrapper('say "{} sessions deleted"'.format(len(session_dates)))
+            # self.system_wrapper('say "{} sessions deleted"'.format(len(session_dates)))
+            self.system_wrapper_say("{} sessions deleted".format(len(session_dates)))
 
     def record_session(self, session_name=None):
         pg_local_port='5430'
@@ -452,7 +469,8 @@ class prodman_backend:
         connection.execute(insert_statement)
         engine.dispose()
         # os.system('say "recorded!"')
-        self.system_wrapper('say "recorded!"')
+        # self.system_wrapper('say "recorded!"')
+        self.system_wrapper_say('recorded!')
     ########
 
 
@@ -495,10 +513,12 @@ class prodman_backend:
         
         print("Notes: {}!".format(notes))                     # PRING STATEMENT OF START
         
-        self.system_wrapper('say "START {}!"'.format(task))
+        # self.system_wrapper('say "START {}!"'.format(task))
+        self.system_wrapper_say("START {}!".format(task))
         if (focus is not None) and (focus!=''):
             # os.system('say "FOCUS ON {}!"'.format(focus))
-            self.system_wrapper('say "FOCUS ON {}!"'.format(focus))
+            # self.system_wrapper('say "FOCUS ON {}!"'.format(focus))
+            self.system_wrapper_say("FOCUS ON {}!".format(focus))
 
         length = datetime.timedelta(seconds=length*60)
         self.length = length        
@@ -527,16 +547,15 @@ class prodman_backend:
             self.timedelta_elapsed = time_now - start_time
             timedelta_remaining = max(length - (timedelta_elapsed_current_phase + self.timedelta_elapsed),datetime.timedelta())
 
-
             # string for dash display
             self.block_time_remaining = self.timedelta_to_string(timedelta_remaining)
             self.block_time_elapsed = (timedelta_elapsed_current_phase + self.timedelta_elapsed)
 
-
             self.totals[task] = total_so_far + self.timedelta_elapsed + timedelta_elapsed_current_phase
             if (dinger is not None) and (dinger is not '') and (type(dinger)in [int, float]) and(dinger>0):
                 if length-timedelta_remaining>dinger_time:
-                    self.system_wrapper('afplay {}'.format(self.ding_sound_location))
+                    # self.system_wrapper_play_ding('afplay {}'.format(self.ding_sound_location))
+                    self.system_wrapper_play_ding()
                     dinger_time=dinger_time+datetime.timedelta(minutes=dinger)
 
             os.system("printf '\033c'")
@@ -550,7 +569,7 @@ class prodman_backend:
 
                 self.counts[task]+=1
                 if applause==True: 
-                    os.system('afplay {}'.format(self.applause_sound_location))
+                    os.system('afplay -v {} {}'.format(self.applause_volume , self.applause_sound_location))
 
                 self.timedelta_elapsed = datetime.timedelta()
                 break
@@ -574,7 +593,8 @@ class prodman_backend:
             if self.user_input is not None and str.lower(self.user_input) == "next":
                 self.initialize_user_input()
                 self.end_timeline_block()
-                self.system_wrapper('say "next!"')
+                # self.system_wrapper('say "next!"')
+                self.system_wrapper_say('next!')
                 
                 break
 
@@ -585,7 +605,8 @@ class prodman_backend:
 
         print("Are you sure you want to go to next block?")
         print("y / n ?")
-        self.system_wrapper('say "you sure, dude ?"')
+        # self.system_wrapper('say "you sure, dude ?"')
+        self.system_wrapper_say('you sure, dude?')
 
         self.new_timeline_block(task='next')
         while self.user_input is None:
@@ -605,7 +626,8 @@ class prodman_backend:
 
     def pause_timer(self, timedelta_remaining):
         print("PAUSING SESSION! type unpause to continue!\n")                  
-        self.system_wrapper('say "pausing current session"')
+        # self.system_wrapper('say "pausing current session"')
+        self.system_wrapper_say('pausing current session!')
 
         self.new_timeline_block(task='pause')
 
@@ -639,19 +661,37 @@ class prodman_backend:
             print("UNPAUSING\n")                                                      # UNPAUSE PRINT
 
             # os.system('say "unpausing current session"')                              # UNPAUSE AUDIO
-            self.system_wrapper('say "unpausing"')
+            # self.system_wrapper('say "unpausing"')
+            self.system_wrapper_say('unpausing')
             # os.system('say "returning to {}"'.format(self.task))                      # UNPAUSE AUDIO
             
-            self.system_wrapper('say "and returning to {}"'.format(self.task))    
+            # self.system_wrapper('say "and returning to {}"'.format(self.task))   
+            self.system_wrapper_say("and returning to {}".format(self.task)) 
             return ""
 
-    @staticmethod
-    def system_wrapper(string):
+    # @staticmethod
+    # def system_wrapper(string):
+    #     def dictate(string):
+    #         os.system(string)
+    #         return
+    #     t=threading.Thread(target=dictate, kwargs={'string':string})
+    #     t.start()
+
+    def system_wrapper_say(self, string):
+        vol_string = ' say [[volm {}]] '.format(self.say_volume)
+        def dictate(string):
+            os.system(string)
+            return
+        t=threading.Thread(target=dictate, kwargs={'string':vol_string+string})
+        t.start()        
+
+    def system_wrapper_play_ding(self):
+        string = 'afplay -v {} {} '.format(self.ding_volume, self.ding_sound_location)
         def dictate(string):
             os.system(string)
             return
         t=threading.Thread(target=dictate, kwargs={'string':string})
-        t.start()
+        t.start()                
 
     def hassler(self, task, focus):
         #########
